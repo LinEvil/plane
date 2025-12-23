@@ -1,4 +1,5 @@
 import { combineTransactionSteps, findChildrenInRange, findDuplicates, getChangedRanges } from "@tiptap/core";
+import type { Editor } from "@tiptap/core";
 import { Fragment, Slice } from "@tiptap/pm/model";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
@@ -8,7 +9,7 @@ import type { UniqueIDOptions } from "./extension";
 // utils
 import { createIdsForView } from "./utils";
 
-export const createUniqueIDPlugin = (options: UniqueIDOptions) => {
+export const createUniqueIDPlugin = (options: UniqueIDOptions, editor: Editor) => {
   let dragSourceElement: Element | null = null;
   let transformPasted = false;
   let syncHandler: (() => void) | null = null;
@@ -17,7 +18,7 @@ export const createUniqueIDPlugin = (options: UniqueIDOptions) => {
     key: new PluginKey("uniqueID"),
     appendTransaction: (transactions, oldState, newState) => {
       const hasDocChanges =
-        transactions.some((transaction) => transaction.docChanged) && !oldState.doc.eq(newState.doc);
+        transactions.some((transaction) => transaction.docChanged) && !oldState.doc.eq(newState.doc) && !editor.view.composing;
       const filterTransactions =
         options.filterTransaction && transactions.some((tr) => !options.filterTransaction?.(tr));
 
